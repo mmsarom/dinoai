@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Game</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none';">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f7f7f7;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+        .base-text {
+            position: absolute;
+            left: 10px;
+            font-size: 20px;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        #score {
+            top: 10px;
+        }
+        
+        #level {
+            top: 40px;
+        }
+
+        #highscore {
+            top: 70px;
+        }
+
+        #generation {
+            top: 100px;
+        }
+
+        #obstacles {
+            top: 130px;
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            font-family: Arial, sans-serif;
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="1400" height="600"></canvas>
+    <div id="score" class="base-text">Score: 0</div>
+    <div id="level" class="base-text">Difficulty Level: 0</div>
+    <div id="highscore" class="base-text">Highscore: 0</div>
+    <div id="generation" class="base-text">Generation: 1</div>
+    <div id="gameOver">Game Over - hit spacebar to try again</div>
+    <!-- Add an element to expose obstacles as a JSON array -->
+    <div id="obstacles" class="base-text">{}</div>
+    <script src="game.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "dino-ai",
+  "version": "1.0.0",
+  "description": "A Node.js project with TensorFlow.js",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test-tfjs.js",
+    "serve": "http-server public"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
+    "@tensorflow/tfjs-vis": "^1.5.1",
+    "chart.js": "^4.4.8",
+    "http-server": "^14.1.1",
+    "puppeteer": "^21.3.8"
+  }
+}
