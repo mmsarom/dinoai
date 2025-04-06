@@ -31,7 +31,7 @@ let obstacles = [];
 let score = 0;
 let highscore = 0;
 let gameOver = false;
-let lastObstacleTime = 0; // Track the last obstacle spawn time
+let lastObstacleTime = 1000; // Track the last obstacle spawn time
 const obstacleSpawnDelay = Math.floor(Math.random() * 500) + 500; // Minimum delay between obstacle spawns in milliseconds
 
 let jumpCount = 0; // Track the number of consecutive jumps
@@ -45,12 +45,34 @@ let resetInProgress = false; // Flag to prevent multiple resets
 const gravity = 0.075;
 let jumpStartTime = 0; // Track when the space bar is pressed
 
+// Track the number of consecutive walls generated
+let consecutiveWalls = 0;
+
+// Track the number of iterations since the last wall was generated
+let iterationsSinceLastWall = 3; // Start with a value greater than 2 to allow initial wall generation
+
+// Add toggles for wall and high object obstacles
+let enableNormalObstacles = true; // Toggle for enabling/disabling normal obstacles
+let enableWallObstacles = true; // Toggle for enabling/disabling wall obstacles
+let enableHighObjectObstacles = true; // Toggle for enabling/disabling high object obstacles
+
+// Ensure the first obstacle spawns within 100ms
+let firstObstacleSpawned = false;
+
+function spawnFirstObstacle() {
+    if (!firstObstacleSpawned) {
+        obstacles.push({ x: canvas.width, y: canvas.height - 150, width: 20, height: 20 });
+        firstObstacleSpawned = true;
+    }
+}
+
 // Key event listeners
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && jumpCount < maxJumps) {
         dino.dy = jumpStrength; // Apply jump strength
         dino.jumping = true; // Set jumping state
         jumpCount++; // Increment jump count
+        dino.isGrounded = false; // Ensure grounded state is false during jumps
     }
 
     if (e.code === 'Enter' && gameOver && !resetInProgress) { // Change to 'Enter' key for resetting the game
@@ -75,9 +97,12 @@ function reset() {
     scoreElement.textContent = `Score: ${score}`; // Reset the score display
     // generationElement.textContent = `Generation: ${generation}`; // Update generation display
     notStarted = true; // Set notStarted to true to wait for the next spacebar press
+    firstObstacleSpawned = false; // Reset the first obstacle spawn flag
 }
 
+// Ensure jump height lines are drawn during manual play
 function gameLoop() {
+    setTimeout(spawnFirstObstacle, 50); // Spawn the first obstacle within 50ms
     if (gameOver) {
         gameOverElement.style.display = 'block';
 
@@ -94,6 +119,9 @@ function gameLoop() {
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw jump height lines
+    drawJumpHeightLines();
 
     // Draw Dino
     ctx.fillStyle = 'green';
@@ -112,6 +140,7 @@ function gameLoop() {
         dino.dy = 0;
         dino.jumping = false;
         jumpCount = 0; // Reset jump count when Dino lands
+        dino.isGrounded = true; // Ensure grounded state is true when Dino lands
     }
 
     // Update Dino's grounded state and time since last jump
@@ -127,17 +156,27 @@ function gameLoop() {
     const currentTime = performance.now();
     if (currentTime - lastObstacleTime > obstacleSpawnDelay) {
         const numObjs = Math.floor(Math.random() * 2 + Math.floor(score / 1000));
-        const wall = Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 1000) / 2));
+        const wall = enableWallObstacles && Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 1000) / 2)) && iterationsSinceLastWall >= 2;
         if (wall) {
+            iterationsSinceLastWall = 0; // Reset the counter when a wall is generated
             const tall = Math.floor(Math.random() * 10) > 7;
             obstacles.push({ x: canvas.width, y: canvas.height - (tall ? 300 : 250), width: 20, height: (tall ? 200 : 150) });
+        } else {
+            iterationsSinceLastWall++; // Increment the counter if no wall is generated
         }
         for (let i = 0; i < numObjs; i++) {
-            const highObject = Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 1000) / 2));
-            // add an wait of 20ms between each object
-            setTimeout(() => {
-                obstacles.push({ x: canvas.width, y: canvas.height - (highObject ? 150 + Math.floor(Math.random() * 200) : 150), width: 20, height: 20 });
-            }, i * Math.floor(Math.random() * 100) + 50); // Delay each object spawn by 20ms
+            if (enableHighObjectObstacles) {
+                const highObject = Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 500)));
+                // add an wait of 20ms between each object
+                setTimeout(() => {
+                    obstacles.push({ x: canvas.width, y: canvas.height - (highObject ? 150 + Math.floor(Math.random() * 200) : 150), width: 20, height: 20 });
+                }, i * Math.floor(Math.random() * 100) + 50); // Delay each object spawn by 20ms
+            }
+            if (enableNormalObstacles) {
+                setTimeout(() => {
+                    obstacles.push({ x: canvas.width, y: canvas.height - (150), width: 20, height: 20 });
+                }, i * Math.floor(Math.random() * 100) + 50); // Delay each object spawn by 20ms
+            }
         }
         lastObstacleTime = currentTime;
     }
@@ -193,7 +232,36 @@ function gameLoop() {
             maxJumpDistance: dino.width * maxJumps // Maximum horizontal distance Dino can clear
         }
     });
-
     // Loop
     requestAnimationFrame(gameLoop);
 }
+
+// Draw jump height lines even when the game is not started
+function drawJumpHeightLines() {
+    ctx.setLineDash([5, 5]); // Set line style to dotted
+    ctx.strokeStyle = 'blue'; // Set line color to blue
+
+    const jumpHeight1 = Math.abs(jumpStrength / gravity); // Calculate height for 1st jump
+    const jumpHeight2 = 2 * jumpHeight1; // Calculate height for 2nd jump
+    const jumpHeight3 = 3 * jumpHeight1; // Calculate height for 3rd jump
+
+    // Draw 1st jump height line
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height - 150 - jumpHeight1);
+    ctx.lineTo(canvas.width, canvas.height - 150 - jumpHeight1);
+    ctx.stroke();
+
+    // Draw 2nd jump height line
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height - 150 - jumpHeight2);
+    ctx.lineTo(canvas.width, canvas.height - 150 - jumpHeight2);
+    ctx.stroke();
+
+    // Draw 3rd jump height line
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height - 150 - jumpHeight3);
+    ctx.lineTo(canvas.width, canvas.height - 150 - jumpHeight3);
+    ctx.stroke();
+    ctx.setLineDash([]); // Reset line style
+}
+

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "node test-tfjs.js",
-    "serve": "http-server public"
+    "serve": "http-server public",
+    "convert-json-to-csv": "node scripts/convert-json-to-csv.js"
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.22.0",
@@ -14,6 +15,7 @@
     "@tensorflow/tfjs-vis": "^1.5.1",
     "chart.js": "^4.4.8",
     "http-server": "^14.1.1",
-    "puppeteer": "^21.3.8"
+    "puppeteer": "^21.3.8",
+    "json2csv": "^5.0.6"
   }
 }

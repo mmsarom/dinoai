@@ -1,7 +1,6 @@
 const tf = require('@tensorflow/tfjs');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-//const tfvis = require('@tensorflow/tfjs-vis'); // Import TensorFlow.js Vis
 
 console.log('TensorFlow.js version:', tf.version.tfjs);
 
@@ -12,7 +11,9 @@ const STATE_SIZE = NUM_OBSTACLES * 8 + 5; // 5 features per obstacle + 3 Dino pa
 const rlModel = tf.sequential();
 rlModel.add(tf.layers.dense({ inputShape: [STATE_SIZE], units: 24, activation: 'relu' })); // Adjust input shape to match STATE_SIZE
 rlModel.add(tf.layers.dense({ units: 24, activation: 'relu' }));
-rlModel.add(tf.layers.dense({ units: 4, activation: 'linear' })); // Output: Q-values for single jump, double jump, triple jump, and no action
+rlModel.add(tf.layers.dense({ units: 32, activation: 'relu' })); // Additional layer for better decision-making
+rlModel.add(tf.layers.dense({ units: 16, activation: 'relu' })); // Another layer for handling complex actions
+rlModel.add(tf.layers.dense({ units: 2, activation: 'linear' })); // Output: Q-values for single jump and no action
 
 rlModel.compile({ optimizer: tf.train.adam(0.001), loss: 'meanSquaredError' });
 
@@ -68,7 +69,7 @@ async function saveHighscore() {
     console.log(`Highscore saved: ${highscore}`);
 }
 
-async function appendGenerationAndScore(generation, score) {
+async function appendGenerationAndScore(generation, score, stepReward, finalReward) {
     const filePath = 'h:/dino-ai/models/training-records.json';
     let records = [];
 
@@ -82,12 +83,12 @@ async function appendGenerationAndScore(generation, score) {
     }
 
     // Append the new record
-    records.push({ generation, score, timestamp: new Date().toISOString() });
+    records.push({ generation, score, lastStepReward: stepReward, finalReward, timestamp: new Date().toISOString() });
 
     // Save the updated records back to the file
     try {
         fs.writeFileSync(filePath, JSON.stringify(records, null, 2));
-        console.log(`Appended generation ${generation} and score ${score} to training records.`);
+        console.log(`Appended generation ${generation}, score ${score}, last generation step ${stepReward} and final reward ${finalReward} to training records.`);
     } catch (error) {
         console.error('Error writing to training records file:', error);
     }
@@ -115,6 +116,7 @@ async function trainRLModel() {
     await page.waitForSelector('#score');
     await page.waitForSelector('#highscore');
     await page.waitForSelector('#generation');
+    await page.waitForSelector('#reward');
     await page.waitForSelector('#obstacles');
     await page.waitForSelector('#gameOver');
 
@@ -132,49 +134,55 @@ async function trainRLModel() {
         }
     }, highscore); // Pass the current highscore to the browser context
 
+    const dino = {
+        isGrounded: true, // Indicates if the Dino is on the ground
+        dy: 0, // Vertical speed
+        timeSinceLastJump: 0 // Time since the last jump
+    };
+
     // RL training loop
-    for (generation; generation < 100000; generation++) {
+    for (generation; generation < 9000; generation++) {
         console.log(`Generation ${generation + 1}`);
         let state = Array(STATE_SIZE).fill(0); // Initialize state with the correct size
         let done = false;
         let survivalTime = 0; // Initialize survival time
         let currentScore = 0; // Initialize current score
+        let totalReward = 0; // Initialize total reward for the generation
+        let stepReward = 0; // Initialize step reward for the generation
+        let jumpCount = 0; // Initialize jump count to track consecutive jumps
 
         // Start the game by simulating an Enter key press
         await page.keyboard.press('Enter');
 
+        let loopStartTime = performance.now(); // Track the start time of the loop
+
         while (!done) {
             survivalTime++; // Increment survival time for each iteration of the loop
 
-            // Add survival time to the reward
-            let reward = survivalTime * 0.01; // Reward increases with survival time
-
-            // Predict Q-values for all actions (single, double, triple jump, no action)
+            // Predict Q-values for all actions (single jump, no action)
             const qValues = rlModel.predict(tf.tensor2d([state], [1, STATE_SIZE])).dataSync();
 
-            // console.log(`Q-values: ${qValues}`); // Log the Q-values for debugging
-
-            // Select the action with the highest Q-value
-            const action = qValues.indexOf(Math.max(...qValues));
+            // Ensure exploration by adding epsilon-greedy action selection
+            const epsilon = 0.1; // Exploration rate (10%)
+            let action;
+            if (Math.random() < epsilon) {
+                action = Math.floor(Math.random() * 2); // Randomly select between 0 (jump) and 1 (no action)
+            } else {
+                action = qValues.indexOf(Math.max(...qValues)); // Select the action with the highest Q-value
+            }
 
             // Perform the selected action
-            if (action === 0) { // Single jump
-                await page.keyboard.press('Space');
-                reward -= 1;
-            } else if (action === 1) { // Double jump
-                await page.keyboard.press('Space');
-                await delay(200); // Add a delay between jumps
-                await page.keyboard.press('Space');
-                reward -= 2;
-            } else if (action === 2) { // Triple jump
-                await page.keyboard.press('Space');
-                await delay(200); // Add a delay between jumps
-                await page.keyboard.press('Space');
-                await delay(200); // Add another delay for the third jump
-                await page.keyboard.press('Space');
-                reward -= 4;
-            } else if (action === 3) { // No action
+            if (action === 0 && dino.isGrounded) { // Single jump only if grounded
+                await page.keyboard.down('Space');
+                await page.keyboard.up('Space');
+                await delay(35);
+            } else if (action === 1) { // No action
                 // Do nothing
+            }
+
+            // Reset jumpCount and isGrounded when Dino lands
+            if (dino.isGrounded && jumpCount > 0) {
+                jumpCount = 0;
             }
 
             // Extract the next state and reward from the game
@@ -225,16 +233,6 @@ async function trainRLModel() {
 
             const { state: nextStateArray, nearestObstacle } = nextState;
 
-            
-
-            // Encourage jumping when an obstacle is near
-            if (nearestObstacle) {
-                const futureDistance = nearestObstacle.futureX - 50; // Predicted distance from Dino to the obstacle
-                if (futureDistance > 0 && futureDistance < 100) {
-                    reward += 2; // Reward for being proactive when an obstacle is predicted to be near
-                }
-            }
-
             // Check if the game is over by reading the `gameOver` div's visibility
             done = await page.evaluate(() => {
                 const gameOverElement = document.getElementById('gameOver');
@@ -247,29 +245,47 @@ async function trainRLModel() {
                 return parseInt(scoreText.replace(/\D/g, ''), 10) || 0;
             });
 
-            // Penalize for collision
+            // Calculate reward for the current step
+            stepReward = 0;
+
+            // Reward based on survival time
+            stepReward += survivalTime * 0.005; // Reduced reward scaling for survival time
+
+            // Penalize heavily for losing the game
             if (done) {
-                reward -= 50; // Apply a penalty for colliding with an obstacle
+                stepReward -= 20; // Reduced penalty for losing the game
 
-                if (currentScore > highscore) {
-                    highscore = currentScore;
-                    reward += 100; // Bonus for achieving a new highscore
-                    await saveHighscore(); // Save the updated highscore
+                // Reward for matching or beating the highscore only when the game is over
+                if (currentScore >= highscore) {
+                    stepReward += 30; // Reduced reward for matching or beating the highscore
+                    if (currentScore > highscore) {
+                        highscore = currentScore;
+                        await saveHighscore(); // Save the updated highscore
 
-                    await page.evaluate((highscore) => {
-                        const highscoreElement = document.getElementById('highscore');
-                        if (highscoreElement) {
-                            highscoreElement.textContent = `Highscore: ${highscore}`;
-                        }
-                    }, highscore);
+                        await page.evaluate((highscore) => {
+                            const highscoreElement = document.getElementById('highscore');
+                            if (highscoreElement) {
+                                highscoreElement.textContent = `Highscore: ${highscore}`;
+                            }
+                        }, highscore);
+                    }
                 }
             }
 
-            // Train the RL model
-            const targetQValues = qValues.slice(); // Copy the current Q-values
-            targetQValues[action] = reward + 0.95 * Math.max(...rlModel.predict(tf.tensor2d([nextStateArray], [1, STATE_SIZE])).dataSync()); // Update the Q-value for the selected action
+            // Exploration incentive
+            if (Math.random() < 0.01) {
+                stepReward += 0.5; // Reduced random reward to encourage exploration
+            }
 
-            const targetTensor = tf.tensor2d([targetQValues], [1, 4]); // Update to match the 4 Q-values
+            // Accumulate the total reward for the generation
+            totalReward += stepReward;
+
+            // Train the RL model - with epsilon-greedy action selection
+            const targetQValues = qValues.slice(); // Copy the current Q-values
+            const maxNextQValue = Math.max(...rlModel.predict(tf.tensor2d([nextStateArray], [1, STATE_SIZE])).dataSync());
+            targetQValues[action] = stepReward + 0.95 * maxNextQValue; // Update the Q-value for the selected action
+
+            const targetTensor = tf.tensor2d([targetQValues], [1, 2]); // Update to match the 2 Q-values
             const stateTensor = tf.tensor2d([state], [1, STATE_SIZE]);
 
             await rlModel.fit(stateTensor, targetTensor, { epochs: 1, verbose: 0 });
@@ -278,14 +294,45 @@ async function trainRLModel() {
             targetTensor.dispose();
 
             state = nextStateArray; // Update state
+
+            // Update the reward on the HTML page
+            await page.evaluate((stepReward) => {
+                const rewardElement = document.getElementById('reward');
+                if (rewardElement) {
+                    rewardElement.textContent = `Reward: ${stepReward}`;
+                }
+            }, stepReward); // Pass the step reward to the browser context
+
+            // Update the qvalue on the HTML page
+            await page.evaluate((qValues) => {
+                const qvalueElement = document.getElementById('qvalues');
+                if (qvalueElement) {
+                    // truncate the qValues to 2 decimal places with actions as keys
+                    // {"0":-48.352806091308594,"1":-144.5240020751953}
+                    const key = {
+                        0: 'Single Jump',
+                        1: 'No Action'
+                    };
+                    // Truncate the Q-values to 2 decimal places
+                    // const truncatedQValues = Object.entries(qValues).map(([key, value]) => [key, Math.round(value * 100) / 100]);
+                    // Convert the Q-values to a string with keys and values
+                    const truncatedQValues = Object.entries(qValues).map(([key, value]) => [key, Math.round(value * 100) / 100]);
+                    qvalueElement.textContent = `Q-values: ${JSON.stringify(truncatedQValues)}`;
+                }
+            }, qValues); // Pass the Q-values to the browser context
+
+            const loopEndTime = performance.now();
+            //console.log(`While loop iteration time: ${loopEndTime - loopStartTime} ms`);
+            loopStartTime = loopEndTime; // Update the start time for the next iteration
         }
+        console.log(`totalReward: ${totalReward}`);
 
         console.log(`Game over! Generation ${generation + 1} completed.`);
 
         // Save model weights and generation after each generation
         await saveModelWeights();
         await saveGeneration();
-        await appendGenerationAndScore(generation, currentScore); // Append generation and score to the file
+        await appendGenerationAndScore(generation, currentScore, stepReward, totalReward); // Append generation, score, and total reward to the file
 
         // Update the generation on the HTML page
         await page.evaluate((currentGeneration) => {
