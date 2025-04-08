@@ -1,6 +1,7 @@
 const tf = require('@tensorflow/tfjs');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const tfvis = require('@tensorflow/tfjs-vis');
 
 console.log('TensorFlow.js version:', tf.version.tfjs);
 
@@ -99,12 +100,28 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Attempted visualisation
+async function setupTensorBoard() {
+    const logDir = 'h:/dino-ai/logs';
+    console.log(`TensorBoard logs will be saved to: ${logDir}`);
+
+    // Visualize the model
+    tfvis.show.modelSummary({ name: 'Model Summary' }, rlModel);
+
+    // Add a callback for TensorBoard logging
+    const tensorBoardCallback = tf.node.tensorBoard(logDir);
+
+    return tensorBoardCallback;
+}
+
 async function trainRLModel() {
+    //const tensorBoardCallback = await setupTensorBoard();
+
     await loadModelWeights(); // Load model weights at the start of training
     await loadGeneration(); // Load generation at the start of training
     await loadHighscore(); // Load highscore at the start of training
 
-    const browser = await puppeteer.launch({ headless: true }); // Run Puppeteer in headless mode
+    const browser = await puppeteer.launch({ headless: false }); // Run Puppeteer in headless mode
     const page = await browser.newPage();
 
     // Navigate to the locally hosted Dino game in the public folder
@@ -288,7 +305,11 @@ async function trainRLModel() {
             const targetTensor = tf.tensor2d([targetQValues], [1, 2]); // Update to match the 2 Q-values
             const stateTensor = tf.tensor2d([state], [1, STATE_SIZE]);
 
-            await rlModel.fit(stateTensor, targetTensor, { epochs: 1, verbose: 0 });
+            await rlModel.fit(stateTensor, targetTensor, { 
+                epochs: 1, 
+                verbose: 0, 
+                callbacks: [tensorBoardCallback] 
+            });
 
             stateTensor.dispose();
             targetTensor.dispose();
