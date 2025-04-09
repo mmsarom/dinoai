@@ -51,10 +51,16 @@
 
         #obstacles {
             top: 130px;
+            display: none;
         }
 
         #qvalues {
             top: 70px;
+            left: 200px;
+        }
+
+        #qaction {
+            top: 40px;
             left: 200px;
         }
 
@@ -79,6 +85,7 @@
     <div id="generation" class="base-text">Generation: 1</div>
     <div id="reward" class="base-text">Reward state: 0</div>
     <div id="qvalues" class="base-text">Q values: 0</div>
+    <div id="qaction" class="base-text">Action: </div>
     <div id="gameOver">Game Over - hit spacebar to try again</div>
     <!-- Add an element to expose obstacles as a JSON array -->
     <div id="obstacles" class="base-text">{}</div>

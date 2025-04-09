@@ -1,125 +1,39 @@
-const tf = require('@tensorflow/tfjs');
-const puppeteer = require('puppeteer');
-const fs = require('fs');
-const tfvis = require('@tensorflow/tfjs-vis');
+import tf from '@tensorflow/tfjs';
+import puppeteer from 'puppeteer';
+import { delay } from './utils/saveUtils.js';
+import { loadModelWeights, saveModelWeights, loadGeneration, saveGeneration, appendGenerationAndScore, loadHighscore, saveHighscore } from './utils/modelUtils.js';
+import { updateGeneration, updateHighscore, updateReward, updateQValues, updateAction } from './utils/pageUtils.js';
 
 console.log('TensorFlow.js version:', tf.version.tfjs);
 
 const NUM_OBSTACLES = 10; // Number of obstacles to consider in the state
-const STATE_SIZE = NUM_OBSTACLES * 8 + 5; // 5 features per obstacle + 3 Dino parameters (total 20)
+const STATE_SIZE = NUM_OBSTACLES * 7 + 5; // 7 features per obstacle + 5 Dino parameters (total 75)
 
-// Define the RL model
-const rlModel = tf.sequential();
-rlModel.add(tf.layers.dense({ inputShape: [STATE_SIZE], units: 24, activation: 'relu' })); // Adjust input shape to match STATE_SIZE
-rlModel.add(tf.layers.dense({ units: 24, activation: 'relu' }));
-rlModel.add(tf.layers.dense({ units: 32, activation: 'relu' })); // Additional layer for better decision-making
-rlModel.add(tf.layers.dense({ units: 16, activation: 'relu' })); // Another layer for handling complex actions
-rlModel.add(tf.layers.dense({ units: 2, activation: 'linear' })); // Output: Q-values for single jump and no action
+// Game static values for physics
+const jumpStrength = -3.3; // Jump strength
+const gravity = 0.075; // Gravity value
 
-rlModel.compile({ optimizer: tf.train.adam(0.001), loss: 'meanSquaredError' });
-
-// Generation
-let generation = 1;
-let highscore = 0; // Initialize highscore variable
-
-async function loadModelWeights() {
-    if (fs.existsSync('h:/dino-ai/models/model-weights.json')) {
-        try {
-            const weights = JSON.parse(fs.readFileSync('h:/dino-ai/models/model-weights.json', 'utf8'));
-            if (weights.length !== rlModel.getWeights().length) {
-                throw new Error('Saved weights are incompatible with the current model architecture.');
-            }
-            rlModel.setWeights(weights.map(w => tf.tensor(w.data, w.shape)));
-            console.log('Model weights loaded.');
-        } catch (error) {
-            console.error('Error loading model weights:', error.message);
-            console.log('Starting training with a fresh model.');
-        }
-    }
-}
-
-async function saveModelWeights() {
-    const weights = rlModel.getWeights().map(w => w.arraySync());
-    const serializedWeights = weights.map(w => ({ data: w, shape: w.shape }));
-    fs.writeFileSync('h:/dino-ai/models/model-weights.json', JSON.stringify(serializedWeights));
-
-    console.log('Model weights saved.');
-}
-
-async function loadGeneration() {
-    if (fs.existsSync('h:/dino-ai/models/generation.json')) {
-        generation = JSON.parse(fs.readFileSync('h:/dino-ai/models/generation.json', 'utf8'));
-        console.log(`Generation loaded: ${generation}`);
-    }
-}
-
-async function saveGeneration() {
-    fs.writeFileSync('h:/dino-ai/models/generation.json', JSON.stringify(generation));
-    console.log(`Generation saved: ${generation}`);
-}
-
-async function loadHighscore() {
-    if (fs.existsSync('h:/dino-ai/models/highscore.json')) {
-        highscore = JSON.parse(fs.readFileSync('h:/dino-ai/models/highscore.json', 'utf8'));
-        console.log(`Highscore loaded: ${highscore}`);
-    }
-}
-
-async function saveHighscore() {
-    fs.writeFileSync('h:/dino-ai/models/highscore.json', JSON.stringify(highscore));
-    console.log(`Highscore saved: ${highscore}`);
-}
-
-async function appendGenerationAndScore(generation, score, stepReward, finalReward) {
-    const filePath = 'h:/dino-ai/models/training-records.json';
-    let records = [];
-
-    // Load existing records if the file exists
-    if (fs.existsSync(filePath)) {
-        try {
-            records = await JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        } catch (error) {
-            console.error('Error reading training records file:', error);
-        }
-    }
-
-    // Append the new record
-    records.push({ generation, score, lastStepReward: stepReward, finalReward, timestamp: new Date().toISOString() });
-
-    // Save the updated records back to the file
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(records, null, 2));
-        console.log(`Appended generation ${generation}, score ${score}, last generation step ${stepReward} and final reward ${finalReward} to training records.`);
-    } catch (error) {
-        console.error('Error writing to training records file:', error);
-    }
-}
-
-// Utility function to add a delay
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Attempted visualisation
-async function setupTensorBoard() {
-    const logDir = 'h:/dino-ai/logs';
-    console.log(`TensorBoard logs will be saved to: ${logDir}`);
-
-    // Visualize the model
-    tfvis.show.modelSummary({ name: 'Model Summary' }, rlModel);
-
-    // Add a callback for TensorBoard logging
-    const tensorBoardCallback = tf.node.tensorBoard(logDir);
-
-    return tensorBoardCallback;
+// Function to initialize the RL model
+function initializeRLModel() {
+    const model = tf.sequential();
+    model.add(tf.layers.dense({ inputShape: [STATE_SIZE], units: 24, activation: 'relu' }));
+    model.add(tf.layers.dense({ units: 24, activation: 'relu' }));
+    model.add(tf.layers.dense({ units: 32, activation: 'relu' }));
+    model.add(tf.layers.dense({ units: 16, activation: 'relu' }));
+    model.add(tf.layers.dense({ units: 2, activation: 'linear' }));
+    model.compile({ optimizer: tf.train.adam(0.001), loss: 'meanSquaredError' });
+    return model;
 }
 
 async function trainRLModel() {
-    //const tensorBoardCallback = await setupTensorBoard();
 
-    await loadModelWeights(); // Load model weights at the start of training
-    await loadGeneration(); // Load generation at the start of training
-    await loadHighscore(); // Load highscore at the start of training
+    // Initialize RL model
+    const rlModel =  initializeRLModel();
+    await loadModelWeights(rlModel); // Load model weights from file
+
+    // Generation
+    let generation = await loadGeneration();
+    let highscore = await loadHighscore(); // Initialize highscore variable
 
     const browser = await puppeteer.launch({ headless: false }); // Run Puppeteer in headless mode
     const page = await browser.newPage();
@@ -137,25 +51,16 @@ async function trainRLModel() {
     await page.waitForSelector('#obstacles');
     await page.waitForSelector('#gameOver');
 
-    await page.evaluate((generation) => {
-        const generationElement = document.getElementById('generation');
-        if (generationElement) {
-            generationElement.textContent = `Generation: ${generation}`;
-        }
-    }, generation); // Pass the current generation to the browser context
-
-    await page.evaluate((highscore) => {
-        const highscoreElement = document.getElementById('highscore');
-        if (highscoreElement) {
-            highscoreElement.textContent = `Highscore: ${highscore}`;
-        }
-    }, highscore); // Pass the current highscore to the browser context
+    await updateGeneration(page, generation); // Update generation on the HTML page
+    await updateHighscore(page, highscore); // Update highscore on the HTML page
 
     const dino = {
         isGrounded: true, // Indicates if the Dino is on the ground
         dy: 0, // Vertical speed
         timeSinceLastJump: 0 // Time since the last jump
     };
+
+    console.log(`generation ${generation}`);
 
     // RL training loop
     for (generation; generation < 9000; generation++) {
@@ -172,6 +77,12 @@ async function trainRLModel() {
         await page.keyboard.press('Enter');
 
         let loopStartTime = performance.now(); // Track the start time of the loop
+
+        // Retrieve canvas dimensions dynamically from the browser context
+        const { canvasWidth, canvasHeight } = await page.evaluate(() => {
+            const canvas = document.getElementById('gameCanvas');
+            return { canvasWidth: canvas.width, canvasHeight: canvas.height };
+        });
 
         while (!done) {
             survivalTime++; // Increment survival time for each iteration of the loop
@@ -203,7 +114,7 @@ async function trainRLModel() {
             }
 
             // Extract the next state and reward from the game
-            const nextState = await page.evaluate((numObstacles) => {
+            const nextState = await page.evaluate((canvasWidth, canvasHeight, jumpStrength, gravity, numObstacles) => {
                 const data = JSON.parse(document.getElementById('obstacles').innerText) || {};
                 const obstaclesData = data.obstacles || [];
                 const dinoData = data.dino || {
@@ -215,38 +126,34 @@ async function trainRLModel() {
                 };
                 const state = [];
 
-                // Define the speed of obstacle movement
-                const obstacleSpeed = 5; // Obstacles move 5 units per frame
-
                 // Add obstacle data to the state
                 for (let i = 0; i < numObstacles; i++) {
                     if (obstaclesData[i]) {
                         state.push(
-                            obstaclesData[i].distance,
-                            obstaclesData[i].yDifference,
-                            obstaclesData[i].type,
-                            obstaclesData[i].width,
-                            obstaclesData[i].height,
-                            obstaclesData[i].x,
-                            obstaclesData[i].y,
-                            obstaclesData[i].x - obstacleSpeed * (dinoData.timeSinceLastJump || 1) // futureX
+                            obstaclesData[i].distance / canvasWidth, // Normalize distance by canvas width
+                            obstaclesData[i].yDifference / canvasHeight, // Normalize yDifference by canvas height
+                            obstaclesData[i].type, // No normalization needed for type
+                            obstaclesData[i].width / canvasWidth, // Normalize width by canvas width
+                            obstaclesData[i].height / canvasHeight, // Normalize height by canvas height
+                            obstaclesData[i].x / canvasWidth, // Normalize x by canvas width
+                            obstaclesData[i].y / canvasHeight // Normalize y by canvas height
                         );
                     } else {
-                        state.push(0, 0, 0, 0, 0, 0, 0, 0); // Fill with zeros if fewer obstacles are present
+                        state.push(0, 0, 0, 0, 0, 0, 0); // Fill with zeros if fewer obstacles are present
                     }
                 }
 
                 // Add Dino's parameters to the state
                 state.push(
-                    dinoData.dy,
-                    dinoData.gravity,
+                    dinoData.dy / jumpStrength, // Normalize dy by jump strength
+                    dinoData.gravity / gravity, // Normalize gravity by its defined value
                     dinoData.isGrounded ? 1 : 0, // Convert boolean to 1 or 0
-                    dinoData.maxJumpHeight || 0, // Add max jump height to the state
-                    dinoData.timeSinceLastJump || 0 // Add time since last jump to the state
+                    dinoData.maxJumpHeight / canvasHeight, // Normalize max jump height by canvas height
+                    dinoData.timeSinceLastJump / 100 // Normalize time since last jump
                 );
 
                 return { state, nearestObstacle: obstaclesData[0] || null };
-            }, NUM_OBSTACLES);
+            }, canvasWidth, canvasHeight, jumpStrength, gravity, NUM_OBSTACLES);
 
             const { state: nextStateArray, nearestObstacle } = nextState;
 
@@ -278,13 +185,7 @@ async function trainRLModel() {
                     if (currentScore > highscore) {
                         highscore = currentScore;
                         await saveHighscore(); // Save the updated highscore
-
-                        await page.evaluate((highscore) => {
-                            const highscoreElement = document.getElementById('highscore');
-                            if (highscoreElement) {
-                                highscoreElement.textContent = `Highscore: ${highscore}`;
-                            }
-                        }, highscore);
+                        await updateHighscore(page, highscore); // Update highscore on the HTML page
                     }
                 }
             }
@@ -305,45 +206,18 @@ async function trainRLModel() {
             const targetTensor = tf.tensor2d([targetQValues], [1, 2]); // Update to match the 2 Q-values
             const stateTensor = tf.tensor2d([state], [1, STATE_SIZE]);
 
-            await rlModel.fit(stateTensor, targetTensor, { 
-                epochs: 1, 
-                verbose: 0, 
-                callbacks: [tensorBoardCallback] 
-            });
+            await rlModel.fit(stateTensor, targetTensor);
 
             stateTensor.dispose();
             targetTensor.dispose();
 
             state = nextStateArray; // Update state
 
-            // Update the reward on the HTML page
-            await page.evaluate((stepReward) => {
-                const rewardElement = document.getElementById('reward');
-                if (rewardElement) {
-                    rewardElement.textContent = `Reward: ${stepReward}`;
-                }
-            }, stepReward); // Pass the step reward to the browser context
-
-            // Update the qvalue on the HTML page
-            await page.evaluate((qValues) => {
-                const qvalueElement = document.getElementById('qvalues');
-                if (qvalueElement) {
-                    // truncate the qValues to 2 decimal places with actions as keys
-                    // {"0":-48.352806091308594,"1":-144.5240020751953}
-                    const key = {
-                        0: 'Single Jump',
-                        1: 'No Action'
-                    };
-                    // Truncate the Q-values to 2 decimal places
-                    // const truncatedQValues = Object.entries(qValues).map(([key, value]) => [key, Math.round(value * 100) / 100]);
-                    // Convert the Q-values to a string with keys and values
-                    const truncatedQValues = Object.entries(qValues).map(([key, value]) => [key, Math.round(value * 100) / 100]);
-                    qvalueElement.textContent = `Q-values: ${JSON.stringify(truncatedQValues)}`;
-                }
-            }, qValues); // Pass the Q-values to the browser context
+            await updateReward(page, stepReward); // Update reward on the HTML page
+            await updateQValues(page, qValues); // Update Q-values on the HTML page
+            await updateAction(page, action); // Update action on the HTML page
 
             const loopEndTime = performance.now();
-            //console.log(`While loop iteration time: ${loopEndTime - loopStartTime} ms`);
             loopStartTime = loopEndTime; // Update the start time for the next iteration
         }
         console.log(`totalReward: ${totalReward}`);
@@ -351,17 +225,11 @@ async function trainRLModel() {
         console.log(`Game over! Generation ${generation + 1} completed.`);
 
         // Save model weights and generation after each generation
-        await saveModelWeights();
-        await saveGeneration();
+        await saveModelWeights(rlModel);
+        await saveGeneration(generation);
         await appendGenerationAndScore(generation, currentScore, stepReward, totalReward); // Append generation, score, and total reward to the file
 
-        // Update the generation on the HTML page
-        await page.evaluate((currentGeneration) => {
-            const generationElement = document.getElementById('generation');
-            if (generationElement) {
-                generationElement.textContent = `Generation: ${currentGeneration}`;
-            }
-        }, generation + 1); // Pass the current generation to the browser context
+        await updateGeneration(page, generation + 1); // Update generation on the HTML page
 
         // Reset the game by simulating an Enter key press
         await page.keyboard.press('Enter');

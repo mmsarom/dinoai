@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A Node.js project with TensorFlow.js",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/index.js",
     "test": "node test-tfjs.js",
