@@ -219,7 +219,7 @@ async function trainRLModel() {
             const targetTensor = tf.tensor2d([targetQValues], [1, 2]); // Update to match the 2 Q-values
             const stateTensor = tf.tensor2d([state], [1, STATE_SIZE]);
 
-            await rlModel.fit(stateTensor, targetTensor);
+            await rlModel.fit(stateTensor, targetTensor, { verbose: 0 });
 
             stateTensor.dispose();
             targetTensor.dispose();
