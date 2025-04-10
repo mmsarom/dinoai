@@ -5,18 +5,21 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
+    "preinstall": "pip install -r requirements.txt",
     "start": "node src/index.js",
     "test": "node test-tfjs.js",
     "serve": "http-server public",
-    "convert-json-to-csv": "node scripts/convert-json-to-csv.js"
+    "convert-json-to-csv": "node scripts/convert-json-to-csv.js",
+    "show-summary": "python ./showModel.py"
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",
+    "@tensorflow/tfjs-node": "^3.1.0",
     "@tensorflow/tfjs-vis": "^1.5.1",
     "chart.js": "^4.4.8",
     "http-server": "^14.1.1",
-    "puppeteer": "^21.3.8",
-    "json2csv": "^5.0.6"
+    "json2csv": "^5.0.6",
+    "puppeteer": "^21.3.8"
   }
 }

@@ -1,4 +1,4 @@
-import tf from '@tensorflow/tfjs';
+import tf from '@tensorflow/tfjs-node';
 import puppeteer from 'puppeteer';
 import { delay } from './utils/saveUtils.js';
 import { loadModelWeights, saveModelWeights, loadGeneration, saveGeneration, appendGenerationAndScore, loadHighscore, saveHighscore } from './utils/modelUtils.js';
@@ -48,7 +48,7 @@ async function trainRLModel() {
     let generation = await loadGeneration();
     let highscore = await loadHighscore(); // Initialize highscore variable
 
-    const browser = await puppeteer.launch({ headless: false }); // Run Puppeteer in headless mode
+    const browser = await puppeteer.launch({ headless: true }); // Run Puppeteer in headless mode
     const page = await browser.newPage();
 
     // Navigate to the locally hosted Dino game in the public folder
@@ -232,6 +232,8 @@ async function trainRLModel() {
 
             const loopEndTime = performance.now();
             loopStartTime = loopEndTime; // Update the start time for the next iteration
+
+
         }
         console.log(`totalReward: ${totalReward}`);
 
@@ -244,11 +246,14 @@ async function trainRLModel() {
 
         await updateGeneration(page, generation + 1); // Update generation on the HTML page
 
-        // Reset the game by simulating an Enter key press
-        await page.keyboard.press('Enter');
+        // Save the model in TensorFlow.js format for visualization in TensorBoard
+        await rlModel.save('file://./model');
 
         // Add a wait of 1 second between generations
         await delay(1000);
+
+        // Reset the game by simulating an Enter key press
+        await page.keyboard.press('Enter');
     }
 
     await browser.close();

@@ -14964,5 +14964,544 @@
     "lastStepReward": -19.345,
     "finalReward": 23.730000000000004,
     "timestamp": "2025-04-10T10:47:11.942Z"
+  },
+  {
+    "generation": 2128,
+    "score": 881,
+    "lastStepReward": -19.29,
+    "finalReward": 32.265,
+    "timestamp": "2025-04-10T11:15:28.148Z"
+  },
+  {
+    "generation": 2128,
+    "score": 2420,
+    "lastStepReward": 12.415,
+    "finalReward": 595.93,
+    "timestamp": "2025-04-10T11:16:27.000Z"
+  },
+  {
+    "generation": 2128,
+    "score": 1642,
+    "lastStepReward": -18.475,
+    "finalReward": 214.825,
+    "timestamp": "2025-04-10T11:17:24.636Z"
+  },
+  {
+    "generation": 2128,
+    "score": 1424,
+    "lastStepReward": -18.425,
+    "finalReward": 230.84999999999997,
+    "timestamp": "2025-04-10T11:27:31.770Z"
+  },
+  {
+    "generation": 2128,
+    "score": 708,
+    "lastStepReward": -19.405,
+    "finalReward": 16.200000000000003,
+    "timestamp": "2025-04-10T11:28:44.053Z"
+  },
+  {
+    "generation": 2128,
+    "score": 2972,
+    "lastStepReward": 15.7,
+    "finalReward": 3265.85,
+    "timestamp": "2025-04-10T11:29:35.409Z"
+  },
+  {
+    "generation": 2129,
+    "score": 276,
+    "lastStepReward": -19.595,
+    "finalReward": -2.3949999999999996,
+    "timestamp": "2025-04-10T11:29:38.365Z"
+  },
+  {
+    "generation": 2130,
+    "score": 699,
+    "lastStepReward": -19.42,
+    "finalReward": 14.930000000000007,
+    "timestamp": "2025-04-10T11:29:44.309Z"
+  },
+  {
+    "generation": 2131,
+    "score": 699,
+    "lastStepReward": -19.33,
+    "finalReward": 25.225,
+    "timestamp": "2025-04-10T11:29:50.232Z"
+  },
+  {
+    "generation": 2132,
+    "score": 700,
+    "lastStepReward": -19.375,
+    "finalReward": 19.375,
+    "timestamp": "2025-04-10T11:29:56.180Z"
+  },
+  {
+    "generation": 2133,
+    "score": 1411,
+    "lastStepReward": -17.53,
+    "finalReward": 593.325,
+    "timestamp": "2025-04-10T11:30:07.086Z"
+  },
+  {
+    "generation": 2134,
+    "score": 701,
+    "lastStepReward": -19.38,
+    "finalReward": 18.750000000000004,
+    "timestamp": "2025-04-10T11:30:13.046Z"
+  },
+  {
+    "generation": 2135,
+    "score": 277,
+    "lastStepReward": -19.6,
+    "finalReward": -3.8000000000000025,
+    "timestamp": "2025-04-10T11:30:16.052Z"
+  },
+  {
+    "generation": 2136,
+    "score": 1418,
+    "lastStepReward": -16.5,
+    "finalReward": 1207.7499999999995,
+    "timestamp": "2025-04-10T11:30:26.969Z"
+  },
+  {
+    "generation": 2137,
+    "score": 1704,
+    "lastStepReward": -18.29,
+    "finalReward": 277.265,
+    "timestamp": "2025-04-10T11:30:39.854Z"
+  },
+  {
+    "generation": 2138,
+    "score": 709,
+    "lastStepReward": -19.4,
+    "finalReward": 17.800000000000004,
+    "timestamp": "2025-04-10T11:30:45.832Z"
+  },
+  {
+    "generation": 2139,
+    "score": 1692,
+    "lastStepReward": -18.325,
+    "finalReward": 262.40000000000003,
+    "timestamp": "2025-04-10T11:30:58.724Z"
+  },
+  {
+    "generation": 2140,
+    "score": 1277,
+    "lastStepReward": -17.935,
+    "finalReward": 410.45500000000004,
+    "timestamp": "2025-04-10T11:31:08.617Z"
+  },
+  {
+    "generation": 2141,
+    "score": 1130,
+    "lastStepReward": -18.12,
+    "finalReward": 336.88000000000005,
+    "timestamp": "2025-04-10T11:31:17.519Z"
+  },
+  {
+    "generation": 2142,
+    "score": 1411,
+    "lastStepReward": -17.815,
+    "finalReward": 462.01500000000004,
+    "timestamp": "2025-04-10T11:31:28.465Z"
+  },
+  {
+    "generation": 2143,
+    "score": 1837,
+    "lastStepReward": -15.469999999999999,
+    "finalReward": 2038.3549999999998,
+    "timestamp": "2025-04-10T11:31:42.381Z"
+  },
+  {
+    "generation": 2143,
+    "score": 359,
+    "lastStepReward": -19.715,
+    "finalReward": -11.735,
+    "timestamp": "2025-04-10T11:32:40.379Z"
+  },
+  {
+    "generation": 2143,
+    "score": 723,
+    "lastStepReward": -19.3,
+    "finalReward": 29.349999999999998,
+    "timestamp": "2025-04-10T11:36:14.790Z"
+  },
+  {
+    "generation": 2143,
+    "score": 354,
+    "lastStepReward": -19.695,
+    "finalReward": -10.545000000000002,
+    "timestamp": "2025-04-10T11:36:29.669Z"
+  },
+  {
+    "generation": 2144,
+    "score": 1284,
+    "lastStepReward": -18.52,
+    "finalReward": 201.27999999999997,
+    "timestamp": "2025-04-10T11:36:39.740Z"
+  },
+  {
+    "generation": 2145,
+    "score": 1212,
+    "lastStepReward": -17.259999999999998,
+    "finalReward": 735.6300000000001,
+    "timestamp": "2025-04-10T11:36:49.197Z"
+  },
+  {
+    "generation": 2145,
+    "score": 365,
+    "lastStepReward": -19.555,
+    "finalReward": 0.02500000000000213,
+    "timestamp": "2025-04-10T11:38:39.225Z"
+  },
+  {
+    "generation": 2146,
+    "score": 368,
+    "lastStepReward": -19.705,
+    "finalReward": -11.15,
+    "timestamp": "2025-04-10T11:38:42.851Z"
+  },
+  {
+    "generation": 2147,
+    "score": 371,
+    "lastStepReward": -19.66,
+    "finalReward": -8.270000000000001,
+    "timestamp": "2025-04-10T11:38:46.515Z"
+  },
+  {
+    "generation": 2148,
+    "score": 468,
+    "lastStepReward": -18.555,
+    "finalReward": 191.02499999999998,
+    "timestamp": "2025-04-10T11:38:50.781Z"
+  },
+  {
+    "generation": 2149,
+    "score": 943,
+    "lastStepReward": -16.22,
+    "finalReward": 1413.2299999999998,
+    "timestamp": "2025-04-10T11:38:58.401Z"
+  },
+  {
+    "generation": 2150,
+    "score": 368,
+    "lastStepReward": -19.565,
+    "finalReward": -0.8599999999999994,
+    "timestamp": "2025-04-10T11:39:02.079Z"
+  },
+  {
+    "generation": 2151,
+    "score": 276,
+    "lastStepReward": -19.305,
+    "finalReward": 28.65,
+    "timestamp": "2025-04-10T11:39:05.045Z"
+  },
+  {
+    "generation": 2152,
+    "score": 1134,
+    "lastStepReward": -18.585,
+    "finalReward": 182.92999999999998,
+    "timestamp": "2025-04-10T11:39:14.011Z"
+  },
+  {
+    "generation": 2153,
+    "score": 1045,
+    "lastStepReward": -17.955,
+    "finalReward": 401.225,
+    "timestamp": "2025-04-10T11:39:22.290Z"
+  },
+  {
+    "generation": 2154,
+    "score": 371,
+    "lastStepReward": -19.53,
+    "finalReward": 2.8249999999999993,
+    "timestamp": "2025-04-10T11:39:25.925Z"
+  },
+  {
+    "generation": 2155,
+    "score": 276,
+    "lastStepReward": -19.54,
+    "finalReward": 1.8900000000000006,
+    "timestamp": "2025-04-10T11:39:28.901Z"
+  },
+  {
+    "generation": 2156,
+    "score": 277,
+    "lastStepReward": -19.21,
+    "finalReward": 44.305,
+    "timestamp": "2025-04-10T11:39:31.846Z"
+  },
+  {
+    "generation": 2157,
+    "score": 275,
+    "lastStepReward": -19.63,
+    "finalReward": -5.124999999999998,
+    "timestamp": "2025-04-10T11:39:34.782Z"
+  },
+  {
+    "generation": 2158,
+    "score": 276,
+    "lastStepReward": -19.15,
+    "finalReward": 53.17499999999999,
+    "timestamp": "2025-04-10T11:39:37.737Z"
+  },
+  {
+    "generation": 2159,
+    "score": 845,
+    "lastStepReward": -16.995,
+    "finalReward": 888.0050000000001,
+    "timestamp": "2025-04-10T11:39:44.668Z"
+  },
+  {
+    "generation": 2160,
+    "score": 1042,
+    "lastStepReward": -16.8,
+    "finalReward": 1009.0999999999999,
+    "timestamp": "2025-04-10T11:39:52.972Z"
+  },
+  {
+    "generation": 2161,
+    "score": 276,
+    "lastStepReward": -18.92,
+    "finalReward": 97.18,
+    "timestamp": "2025-04-10T11:39:55.938Z"
+  },
+  {
+    "generation": 2162,
+    "score": 1234,
+    "lastStepReward": -16.115,
+    "finalReward": 1494.2649999999996,
+    "timestamp": "2025-04-10T11:40:05.582Z"
+  },
+  {
+    "generation": 2162,
+    "score": 758,
+    "lastStepReward": -17.69,
+    "finalReward": 517.7649999999998,
+    "timestamp": "2025-04-10T11:40:30.051Z"
+  },
+  {
+    "generation": 2163,
+    "score": 326,
+    "lastStepReward": -18.805,
+    "finalReward": 123.39999999999998,
+    "timestamp": "2025-04-10T11:40:36.482Z"
+  },
+  {
+    "generation": 2164,
+    "score": 814,
+    "lastStepReward": -17.43,
+    "finalReward": 645.2749999999999,
+    "timestamp": "2025-04-10T11:40:51.108Z"
+  },
+  {
+    "generation": 2165,
+    "score": 326,
+    "lastStepReward": -19.4,
+    "finalReward": 17.800000000000004,
+    "timestamp": "2025-04-10T11:40:57.565Z"
+  },
+  {
+    "generation": 2166,
+    "score": 1245,
+    "lastStepReward": -15.14,
+    "finalReward": 2348.89,
+    "timestamp": "2025-04-10T11:41:19.339Z"
+  },
+  {
+    "generation": 2167,
+    "score": 434,
+    "lastStepReward": -18.735,
+    "finalReward": 143.15499999999997,
+    "timestamp": "2025-04-10T11:41:27.581Z"
+  },
+  {
+    "generation": 2168,
+    "score": 601,
+    "lastStepReward": -18.895,
+    "finalReward": 103.15499999999999,
+    "timestamp": "2025-04-10T11:41:38.649Z"
+  },
+  {
+    "generation": 2169,
+    "score": 596,
+    "lastStepReward": -16.32,
+    "finalReward": 1337.58,
+    "timestamp": "2025-04-10T11:41:49.578Z"
+  },
+  {
+    "generation": 2170,
+    "score": 655,
+    "lastStepReward": -13.969999999999999,
+    "finalReward": 3622.605,
+    "timestamp": "2025-04-10T11:42:01.495Z"
+  },
+  {
+    "generation": 2171,
+    "score": 1298,
+    "lastStepReward": -14.475,
+    "finalReward": 3043.325,
+    "timestamp": "2025-04-10T11:42:24.154Z"
+  },
+  {
+    "generation": 2172,
+    "score": 812,
+    "lastStepReward": -15.67,
+    "finalReward": 1861.5549999999998,
+    "timestamp": "2025-04-10T11:42:38.675Z"
+  },
+  {
+    "generation": 2173,
+    "score": 708,
+    "lastStepReward": -18.235,
+    "finalReward": 292.90500000000003,
+    "timestamp": "2025-04-10T11:42:51.496Z"
+  },
+  {
+    "generation": 2174,
+    "score": 650,
+    "lastStepReward": -17.945,
+    "finalReward": 404.83000000000004,
+    "timestamp": "2025-04-10T11:43:03.388Z"
+  },
+  {
+    "generation": 2175,
+    "score": 327,
+    "lastStepReward": -19.27,
+    "finalReward": 35.655,
+    "timestamp": "2025-04-10T11:43:09.835Z"
+  },
+  {
+    "generation": 2176,
+    "score": 433,
+    "lastStepReward": -17.965,
+    "finalReward": 396.64,
+    "timestamp": "2025-04-10T11:43:18.060Z"
+  },
+  {
+    "generation": 2177,
+    "score": 326,
+    "lastStepReward": -18.94,
+    "finalReward": 92.89000000000001,
+    "timestamp": "2025-04-10T11:43:24.516Z"
+  },
+  {
+    "generation": 2178,
+    "score": 325,
+    "lastStepReward": -17.93,
+    "finalReward": 411.52500000000003,
+    "timestamp": "2025-04-10T11:43:30.943Z"
+  },
+  {
+    "generation": 2179,
+    "score": 325,
+    "lastStepReward": -18.855,
+    "finalReward": 111.67499999999997,
+    "timestamp": "2025-04-10T11:43:37.396Z"
+  },
+  {
+    "generation": 2180,
+    "score": 921,
+    "lastStepReward": -13.85,
+    "finalReward": 3770.825,
+    "timestamp": "2025-04-10T11:43:53.744Z"
+  },
+  {
+    "generation": 2181,
+    "score": 865,
+    "lastStepReward": -15.04,
+    "finalReward": 2446.64,
+    "timestamp": "2025-04-10T11:44:09.188Z"
+  },
+  {
+    "generation": 2182,
+    "score": 758,
+    "lastStepReward": -15.26,
+    "finalReward": 2233.1299999999997,
+    "timestamp": "2025-04-10T11:44:22.858Z"
+  },
+  {
+    "generation": 2183,
+    "score": 326,
+    "lastStepReward": -18.135,
+    "finalReward": 330.25500000000005,
+    "timestamp": "2025-04-10T11:44:29.308Z"
+  },
+  {
+    "generation": 2184,
+    "score": 435,
+    "lastStepReward": -16.395,
+    "finalReward": 1283.4049999999997,
+    "timestamp": "2025-04-10T11:44:37.557Z"
+  },
+  {
+    "generation": 2185,
+    "score": 1081,
+    "lastStepReward": -16.53,
+    "finalReward": 1190.3249999999998,
+    "timestamp": "2025-04-10T11:44:56.587Z"
+  },
+  {
+    "generation": 2186,
+    "score": 920,
+    "lastStepReward": -13.76,
+    "finalReward": 3881.8799999999997,
+    "timestamp": "2025-04-10T11:45:12.944Z"
+  },
+  {
+    "generation": 2187,
+    "score": 1246,
+    "lastStepReward": -16.1,
+    "finalReward": 1507.4499999999998,
+    "timestamp": "2025-04-10T11:45:34.761Z"
+  },
+  {
+    "generation": 2188,
+    "score": 327,
+    "lastStepReward": -19.305,
+    "finalReward": 29.15,
+    "timestamp": "2025-04-10T11:45:41.231Z"
+  },
+  {
+    "generation": 2189,
+    "score": 544,
+    "lastStepReward": -16.634999999999998,
+    "finalReward": 1117.5049999999997,
+    "timestamp": "2025-04-10T11:45:51.314Z"
+  },
+  {
+    "generation": 2190,
+    "score": 381,
+    "lastStepReward": -17.72,
+    "finalReward": 501.98,
+    "timestamp": "2025-04-10T11:45:58.670Z"
+  },
+  {
+    "generation": 2191,
+    "score": 1027,
+    "lastStepReward": -15.04,
+    "finalReward": 2447.64,
+    "timestamp": "2025-04-10T11:46:16.803Z"
+  },
+  {
+    "generation": 2192,
+    "score": 1356,
+    "lastStepReward": -16.605,
+    "finalReward": 1137.2999999999997,
+    "timestamp": "2025-04-10T11:46:40.462Z"
+  },
+  {
+    "generation": 2193,
+    "score": 327,
+    "lastStepReward": -19.345,
+    "finalReward": 23.230000000000004,
+    "timestamp": "2025-04-10T11:46:46.938Z"
+  },
+  {
+    "generation": 2194,
+    "score": 435,
+    "lastStepReward": -19.075,
+    "finalReward": 66.52499999999999,
+    "timestamp": "2025-04-10T11:46:55.211Z"
   }
 ]

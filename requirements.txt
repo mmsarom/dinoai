@@ -1,0 +1,4 @@
+tensorflow==2.19.0
+tensorboard==2.19.0
+tensorflowjs==4.5.0
+numpy>=1.20.0

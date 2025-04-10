@@ -166,7 +166,7 @@ function gameLoop() {
         }
         for (let i = 0; i < numObjs; i++) {
             if (enableHighObjectObstacles) {
-                const highObject = Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 500)));
+                const highObject = Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 100)));
                 // add an wait of 20ms between each object
                 setTimeout(() => {
                     obstacles.push({ x: canvas.width, y: canvas.height - (highObject ? 150 + Math.floor(Math.random() * 200) : 150), width: 20, height: 20 });
