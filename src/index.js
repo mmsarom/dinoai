@@ -14,6 +14,19 @@ const jumpStrength = -3.3; // Jump strength
 const gravity = 0.075; // Gravity value
 
 // Function to initialize the RL model
+/**
+ * Initializes and returns a reinforcement learning model using TensorFlow.js.
+ * ReLU --- Rectified Linear Unit Activation Functionn
+ * 
+ * The model is a sequential neural network with the following architecture:
+ * - Input layer: Dense layer with `STATE_SIZE` input shape and 24 units, using ReLU activation.
+ * - Hidden layers: Three dense layers with 24, 32, and 16 units respectively, all using ReLU activation.
+ * - Output layer: Dense layer with 2 units and a linear activation function.
+ * 
+ * The model is compiled with the Adam optimizer (learning rate: 0.001) and mean squared error as the loss function.
+ * 
+ * @returns {tf.Sequential} The compiled TensorFlow.js sequential model.
+ */
 function initializeRLModel() {
     const model = tf.sequential();
     model.add(tf.layers.dense({ inputShape: [STATE_SIZE], units: 24, activation: 'relu' }));
@@ -184,7 +197,7 @@ async function trainRLModel() {
                     stepReward += 30; // Reduced reward for matching or beating the highscore
                     if (currentScore > highscore) {
                         highscore = currentScore;
-                        await saveHighscore(); // Save the updated highscore
+                        await saveHighscore(highscore); // Save the updated highscore
                         await updateHighscore(page, highscore); // Update highscore on the HTML page
                     }
                 }
