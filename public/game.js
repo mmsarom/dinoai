@@ -59,11 +59,18 @@ let enableHighObjectObstacles = true; // Toggle for enabling/disabling high obje
 // Ensure the first obstacle spawns within 100ms
 let firstObstacleSpawned = false;
 
+// Load the sprite image
+const spriteImage = new Image();
+
 function spawnFirstObstacle() {
     if (!firstObstacleSpawned) {
         obstacles.push({ x: canvas.width, y: canvas.height - 150, width: 20, height: 20 });
         firstObstacleSpawned = true;
     }
+}
+
+window.onload = function () {
+    spriteImage.src = 'assets/sprite.png'; // Replace with the actual path to your sprite image
 }
 
 // Key event listeners
@@ -100,7 +107,6 @@ function reset() {
     firstObstacleSpawned = false; // Reset the first obstacle spawn flag
 }
 
-// Ensure jump height lines are drawn during manual play
 function gameLoop() {
     setTimeout(spawnFirstObstacle, 50); // Spawn the first obstacle within 50ms
     if (gameOver) {
@@ -123,9 +129,8 @@ function gameLoop() {
     // Draw jump height lines
     drawJumpHeightLines();
 
-    // Draw Dino
-    ctx.fillStyle = 'green';
-    ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+    // Draw Dino using the sprite image
+    ctx.drawImage(spriteImage, 1514, 0, 88, 94, dino.x, dino.y, dino.width, dino.height);
 
     // Apply gravity
     dino.y += dino.dy;
@@ -153,6 +158,7 @@ function gameLoop() {
     }
 
     // Spawn obstacles with delay
+    const highObject = Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 100)));
     const currentTime = performance.now();
     if (currentTime - lastObstacleTime > obstacleSpawnDelay) {
         const numObjs = Math.floor(Math.random() * 2 + Math.floor(score / 1000));
@@ -165,16 +171,15 @@ function gameLoop() {
             iterationsSinceLastWall++; // Increment the counter if no wall is generated
         }
         for (let i = 0; i < numObjs; i++) {
-            if (enableHighObjectObstacles) {
-                const highObject = Math.floor(Math.random() * 10) > (10 - (Math.ceil(score / 100)));
+            if (enableHighObjectObstacles && highObject) {
                 // add an wait of 20ms between each object
                 setTimeout(() => {
-                    obstacles.push({ x: canvas.width, y: canvas.height - (highObject ? 150 + Math.floor(Math.random() * 200) : 150), width: 20, height: 20 });
+                    obstacles.push({ sx: 260, sy: 0, sw: 83, sh: 94, x: canvas.width, y: canvas.height - (highObject ? 150 + Math.floor(Math.random() * 200) : 150), width: 20, height: 20 });
                 }, i * Math.floor(Math.random() * 100) + 50); // Delay each object spawn by 20ms
             }
             if (enableNormalObstacles) {
                 setTimeout(() => {
-                    obstacles.push({ x: canvas.width, y: canvas.height - (150), width: 20, height: 20 });
+                    obstacles.push({ sx: 652, sy: 0, sw: 55, sh: 94, x: canvas.width, y: canvas.height - (150), width: 20, height: 20 });
                 }, i * Math.floor(Math.random() * 100) + 50); // Delay each object spawn by 20ms
             }
         }
@@ -185,7 +190,17 @@ function gameLoop() {
     ctx.fillStyle = 'black';
     for (let i = 0; i < obstacles.length; i++) {
         obstacles[i].x -= 5;
-        ctx.fillRect(obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
+        ctx.drawImage(
+            spriteImage,
+            obstacles[i].sx,
+            obstacles[i].sy,
+            obstacles[i].sw,
+            obstacles[i].sh,
+            obstacles[i].x, // Destination x-coordinate
+            obstacles[i].y, // Destination y-coordinate
+            obstacles[i].width, // Destination width
+            obstacles[i].height // Destination height
+        );
 
         // Check for collision
         if (
